@@ -22,6 +22,7 @@ class Marker : public QObject
 	Q_PROPERTY(int g READ g WRITE setG NOTIFY gChanged)
 	Q_PROPERTY(int b READ b WRITE setB NOTIFY bChanged)
 	Q_PROPERTY(int penSize READ penSize WRITE setPenSize NOTIFY penSizeChanged)
+    Q_PROPERTY(bool dirty READ dirty WRITE setDirty NOTIFY dirtyChanged)
 	QString m_aDir = "";
 	QString m_bDir = "";
 	QString m_filename = "";
@@ -37,11 +38,19 @@ class Marker : public QObject
 	int m_b = 0;
 
 	int m_penSize = 0;
-	QColor c;
+    QColor c;
+    bool m_dirty=false;
+
 public:
 	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i), c(0, 0, 0)
 	{
 	}
+    Q_INVOKABLE void saveImageB()
+    {
+        auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;
+        ip->image_map["b"].save(QDir(b).filePath(m_filename));
+        setDirty(false);
+    }
 
 	Q_INVOKABLE void draw(int x, int y)
 	{
@@ -57,6 +66,7 @@ public:
 				image_b.setPixelColor(i, j, c);
 				image_a.setPixelColor(i, j, c == QColor(255, 255, 255) ? image_origin.pixelColor(i, j) : c);
 			}
+        setDirty(true);
 	}
 
 	QString aDir() const
@@ -104,7 +114,12 @@ public:
 		return m_penSize;
 	}
 
-	signals :
+    bool dirty() const
+    {
+        return m_dirty;
+    }
+
+signals :
 
 	void aDirChanged(QString aDir);
 
@@ -123,6 +138,8 @@ public:
 	void bChanged(int b);
 
 	void penSizeChanged(int penSize);
+
+    void dirtyChanged(bool dirty);
 
 public slots:
 	void setADir(QString aDir)
@@ -150,6 +167,7 @@ public slots:
 		auto a = m_aDir.startsWith("file:///") ? m_aDir.mid(8) : m_aDir;
 		auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;
 		ip->image_map["b"].save(QDir(b).filePath(m_filename));
+        setDirty(false);
 		m_filename = filename;
 
 		if (m_filename.isEmpty() == false)
@@ -231,7 +249,15 @@ public slots:
 
 		m_penSize = penSize;
 		emit penSizeChanged(penSize);
-	}
+    }
+    void setDirty(bool dirty)
+    {
+        if (m_dirty == dirty)
+            return;
+
+        m_dirty = dirty;
+        emit dirtyChanged(dirty);
+    }
 };
 
 #endif // MARKER_H

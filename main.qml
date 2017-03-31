@@ -9,8 +9,13 @@ ApplicationWindow {
     visible: true
     width: 800
     height: 600
-    title: marker.filename?marker.filename:"Marker"
+    title: (marker.filename?marker.filename:"Marker")+(marker.dirty?"*":"")
     visibility: "Maximized"
+    onClosing:
+    {
+        if(marker.dirty)
+            marker.saveImageB();
+    }
 
     FileDialog {
         id: fileDialogA
