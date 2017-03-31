@@ -27,97 +27,42 @@ class Marker : public QObject
 	QString m_bDir = "";
 	QString m_filename = "";
 	ImageProvider* ip;
-	double m_realHeight;
-
-	double m_realWidth;
-
+	double m_realHeight=0;
+	double m_realWidth=0;
 	int m_r = 0;
-
 	int m_g = 0;
-
 	int m_b = 0;
-
 	int m_penSize = 0;
     QColor c;
     bool m_dirty=false;
-
 public:
 	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i), c(0, 0, 0)
 	{
 	}
-    Q_INVOKABLE void saveImageB()
-    {
-        auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;
-        ip->image_map["b"].save(QDir(b).filePath(m_filename));
-        setDirty(false);
-    }
 
-	Q_INVOKABLE void draw(int x, int y)
-	{
-		qDebug() << x << " " << y;
-		auto&& image_a = ip->image_map["a"];
-		auto&& image_b = ip->image_map["b"];
-		auto&& image_origin = ip->image_map["c"];
-		x = round(1.0*x / m_realWidth * image_a.size().width());
-		y = round(1.0*y / m_realHeight * image_a.size().height());
-		for (int i = x - penSize(); i <= x + penSize(); ++i)
-			for (int j = y - penSize(); j <= y + penSize(); ++j)
-			{
-				image_b.setPixelColor(i, j, c);
-				image_a.setPixelColor(i, j, c == QColor(255, 255, 255) ? image_origin.pixelColor(i, j) : c);
-			}
-        setDirty(true);
-	}
+    Q_INVOKABLE void saveImageB();
 
-	QString aDir() const
-	{
-		return m_aDir;
-	}
+	Q_INVOKABLE void draw(int x, int y);
 
-	QString bDir() const
-	{
-		return m_bDir;
-	}
+	QString aDir() const;
 
-	QString filename() const
-	{
-		return m_filename;
-	}
+	QString bDir() const;
 
-	double realHeight() const
-	{
-		return m_realHeight;
-	}
+	QString filename() const;
 
-	double realWidth() const
-	{
-		return m_realWidth;
-	}
+	double realHeight() const;
 
-	int r() const
-	{
-		return m_r;
-	}
+	double realWidth() const;
 
-	int g() const
-	{
-		return m_g;
-	}
+	int r() const;
 
-	int b() const
-	{
-		return m_b;
-	}
+	int g() const;
 
-	int penSize() const
-	{
-		return m_penSize;
-	}
+	int b() const;
 
-    bool dirty() const
-    {
-        return m_dirty;
-    }
+	int penSize() const;
+
+	bool dirty() const;
 
 signals :
 
@@ -139,125 +84,28 @@ signals :
 
 	void penSizeChanged(int penSize);
 
-    void dirtyChanged(bool dirty);
+	void dirtyChanged(bool dirty);
 
 public slots:
-	void setADir(QString aDir)
-	{
-		if (m_aDir == aDir)
-			return;
+	void setADir(QString aDir);
 
-		m_aDir = aDir;
-		emit aDirChanged(aDir);
-	}
+	void setBDir(QString bDir);
 
-	void setBDir(QString bDir)
-	{
-		if (m_bDir == bDir)
-			return;
+	void setFilename(QString filename);
 
-		m_bDir = bDir;
-		emit bDirChanged(bDir);
-	}
+	void setRealHeight(double realHeight);
 
-	void setFilename(QString filename)
-	{
-		if (m_filename == filename)
-			return;
-		auto a = m_aDir.startsWith("file:///") ? m_aDir.mid(8) : m_aDir;
-		auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;
-		ip->image_map["b"].save(QDir(b).filePath(m_filename));
-        setDirty(false);
-		m_filename = filename;
+	void setRealWidth(double realWidth);
 
-		if (m_filename.isEmpty() == false)
-		{
-			auto&& image = ip->image_map["a"];
+	void setR(int r);
 
-			auto a_path = QDir(a).filePath(m_filename);
-			QFileInfo c(a_path);
-			if (c.exists() == false)
-				throw "can not open file";
-			image.load(a_path);
-			ip->image_map["c"] = image.copy();
-			auto b_path = QDir(b).filePath(m_filename);
-			QFileInfo check_file(b_path);
-			if (check_file.exists() && check_file.isFile())
-			{
-				ip->image_map["b"].load(b_path);
-			}
-			else
-			{
-				ip->image_map["b"] = QImage(ip->image_map["a"].size(), ip->image_map["a"].format());
-			}
-		}
-		emit filenameChanged(filename);
-	}
+	void setG(int g);
 
-	void setRealHeight(double realHeight)
-	{
-		if (m_realHeight == realHeight)
-			return;
+	void setB(int b);
 
-		m_realHeight = realHeight;
-		emit realHeightChanged(realHeight);
-	}
+	void setPenSize(int penSize);
 
-	void setRealWidth(double realWidth)
-	{
-		if (m_realWidth == realWidth)
-			return;
-
-		m_realWidth = realWidth;
-		emit realWidthChanged(realWidth);
-	}
-
-	void setR(int r)
-	{
-		if (m_r == r)
-			return;
-
-		m_r = r;
-		c = QColor(m_r, m_g, m_b);
-		emit rChanged(r);
-	}
-
-	void setG(int g)
-	{
-		if (m_g == g)
-			return;
-
-		m_g = g;
-		c = QColor(m_r, m_g, m_b);
-		emit gChanged(g);
-	}
-
-	void setB(int b)
-	{
-		if (m_b == b)
-			return;
-
-		m_b = b;
-		c = QColor(m_r, m_g, m_b);
-		emit bChanged(b);
-	}
-
-	void setPenSize(int penSize)
-	{
-		if (m_penSize == penSize)
-			return;
-
-		m_penSize = penSize;
-		emit penSizeChanged(penSize);
-    }
-    void setDirty(bool dirty)
-    {
-        if (m_dirty == dirty)
-            return;
-
-        m_dirty = dirty;
-        emit dirtyChanged(dirty);
-    }
+	void setDirty(bool dirty);
 };
 
 #endif // MARKER_H

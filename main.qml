@@ -192,8 +192,6 @@ ApplicationWindow {
                 }
             }
             Image {
-                property int xpos
-                property int ypos
                 property bool drawing: false
                 Layout.fillHeight: true
                 Layout.fillWidth: true
@@ -218,12 +216,12 @@ ApplicationWindow {
                     height: image_a.paintedHeight
 
                     onPressed: {
-                        image_a.xpos = mouseX
-                        image_a.ypos = mouseY
                         image_a.drawing=true;
-                        marker.draw(image_a.xpos,image_a.y.pos);
+
+                        marker.draw(mouseX,mouseY);
                         image_a.refresh();
                         image_b.refresh();
+
                     }
                     onReleased:
                     {
@@ -231,21 +229,17 @@ ApplicationWindow {
                     }
 
                     onMouseXChanged: {
-                        image_a.xpos = mouseX
-                        image_a.ypos = mouseY
                         if(image_a.drawing)
                         {
-                            marker.draw(image_a.xpos,image_a.ypos);
+                            marker.draw(mouseX,mouseY);
                             image_a.refresh();
                             image_b.refresh();
                         }
                     }
                     onMouseYChanged: {
-                        image_a.xpos = mouseX
-                        image_a.ypos = mouseY
                         if(image_a.drawing)
                         {
-                            marker.draw(image_a.xpos,image_a.ypos);
+                            marker.draw(mouseX,mouseY);
                             image_a.refresh();
                             image_b.refresh();
                         }
