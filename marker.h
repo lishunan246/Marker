@@ -30,13 +30,13 @@ class Marker : public QObject
 
 	double m_realWidth;
 
-    int m_r = 0;
+	int m_r = 0;
 
-    int m_g = 0;
+	int m_g = 0;
 
-    int m_b = 0;
+	int m_b = 0;
 
-    int m_penSize = 0;
+	int m_penSize = 0;
 	QColor c;
 public:
 	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i), c(0, 0, 0)
@@ -48,13 +48,15 @@ public:
 		qDebug() << x << " " << y;
 		auto&& image_a = ip->image_map["a"];
 		auto&& image_b = ip->image_map["b"];
-		x = x / m_realWidth * (image_a.size().width());
-		y = y / m_realHeight * image_a.size().height();
-        for(int i=x-penSize();i<=x+penSize();++i)
-            for(int j=y-penSize();j<=y+penSize();++j)
-            {
-                image_b.setPixelColor(i, j, c);
-            }
+		auto&& image_origin = ip->image_map["c"];
+		x = round(1.0*x / m_realWidth * image_a.size().width());
+		y = round(1.0*y / m_realHeight * image_a.size().height());
+		for (int i = x - penSize(); i <= x + penSize(); ++i)
+			for (int j = y - penSize(); j <= y + penSize(); ++j)
+			{
+				image_b.setPixelColor(i, j, c);
+				image_a.setPixelColor(i, j, c == QColor(255, 255, 255) ? image_origin.pixelColor(i, j) : c);
+			}
 	}
 
 	QString aDir() const
@@ -159,7 +161,7 @@ public slots:
 			if (c.exists() == false)
 				throw "can not open file";
 			image.load(a_path);
-
+			ip->image_map["c"] = image.copy();
 			auto b_path = QDir(b).filePath(m_filename);
 			QFileInfo check_file(b_path);
 			if (check_file.exists() && check_file.isFile())
