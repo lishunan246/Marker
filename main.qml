@@ -195,25 +195,23 @@ ApplicationWindow {
                 id: image_a
                 source:"image://image/a"
                 cache: false
-
                 fillMode: Image.PreserveAspectFit
 
                 function refresh(){
-
                     var t=source;
-
                     source="";
-
                     source=t;
-
                     console.log(t+" refreshed.");
                     marker.realWidth=image_a.paintedWidth;
                     marker.realHeight=image_a.paintedHeight;
                 }
+
                 MouseArea
                 {
+                    anchors.centerIn: parent
+                    width: image_a.paintedWidth
+                    height: image_a.paintedHeight
 
-                    anchors.fill:parent
                     onPressed: {
                         image_a.xpos = mouseX
                         image_a.ypos = mouseY
