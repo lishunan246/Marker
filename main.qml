@@ -67,6 +67,7 @@ ApplicationWindow {
 
     RowLayout {
         id: rowLayout
+        spacing: 0
         anchors.rightMargin: 0
         anchors.bottomMargin: 0
         anchors.leftMargin: 0
@@ -110,9 +111,14 @@ ApplicationWindow {
         ColumnLayout
         {
             width: (parent.width-150)/2
+            Layout.minimumWidth: (parent.width-150)/2
+            Layout.maximumWidth: (parent.width-150)/2
+            Layout.fillWidth: true
+            spacing: 0
             Layout.fillHeight:true
             RowLayout{
                 height: 200
+                spacing: 0
                 Layout.fillWidth: true
                 width: parent.width
                 Button{
@@ -185,9 +191,14 @@ ApplicationWindow {
         ColumnLayout
         {
             width: (parent.width-150)/2
+            Layout.minimumWidth: (parent.width-150)/2
+            Layout.maximumWidth: (parent.width-150)/2
+            Layout.fillWidth: true
+            spacing: 0
             Layout.fillHeight:true
             RowLayout{
                 height: 200
+                spacing: 0
                 Layout.fillWidth: true
                 Button{
                     text: "浏览"
