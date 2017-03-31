@@ -6,7 +6,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
-
+#include <QColor>
 #include <iostream>
 #include "imageprovider.h"
 
@@ -16,31 +16,45 @@ class Marker : public QObject
 	Q_PROPERTY(QString aDir READ aDir WRITE setADir NOTIFY aDirChanged)
 	Q_PROPERTY(QString bDir READ bDir WRITE setBDir NOTIFY bDirChanged)
 	Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
-    Q_PROPERTY(double realHeight READ realHeight WRITE setRealHeight NOTIFY realHeightChanged)
-    Q_PROPERTY(double realWidth READ realWidth WRITE setRealWidth NOTIFY realWidthChanged)
+	Q_PROPERTY(double realHeight READ realHeight WRITE setRealHeight NOTIFY realHeightChanged)
+	Q_PROPERTY(double realWidth READ realWidth WRITE setRealWidth NOTIFY realWidthChanged)
+	Q_PROPERTY(int r READ r WRITE setR NOTIFY rChanged)
+	Q_PROPERTY(int g READ g WRITE setG NOTIFY gChanged)
+	Q_PROPERTY(int b READ b WRITE setB NOTIFY bChanged)
+	Q_PROPERTY(int penSize READ penSize WRITE setPenSize NOTIFY penSizeChanged)
 	QString m_aDir = "";
 	QString m_bDir = "";
 	QString m_filename = "";
-    ImageProvider* ip;
-    double m_realHeight;
+	ImageProvider* ip;
+	double m_realHeight;
 
-    double m_realWidth;
+	double m_realWidth;
 
+    int m_r = 0;
+
+    int m_g = 0;
+
+    int m_b = 0;
+
+    int m_penSize = 0;
+	QColor c;
 public:
-	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i)
+	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i), c(0, 0, 0)
 	{
 	}
 
 	Q_INVOKABLE void draw(int x, int y)
 	{
-        qDebug()<< x << " " << y;
+		qDebug() << x << " " << y;
 		auto&& image_a = ip->image_map["a"];
 		auto&& image_b = ip->image_map["b"];
-        x=x/m_realWidth*(image_a.size().width());
-		y = y / m_realHeight*image_a.size().height();
-
-		image_b.setPixel(x, y, 0xffffff);
-
+		x = x / m_realWidth * (image_a.size().width());
+		y = y / m_realHeight * image_a.size().height();
+        for(int i=x-penSize();i<=x+penSize();++i)
+            for(int j=y-penSize();j<=y+penSize();++j)
+            {
+                image_b.setPixelColor(i, j, c);
+            }
 	}
 
 	QString aDir() const
@@ -58,17 +72,37 @@ public:
 		return m_filename;
 	}
 
-    double realHeight() const
-    {
-        return m_realHeight;
-    }
+	double realHeight() const
+	{
+		return m_realHeight;
+	}
 
-    double realWidth() const
-    {
-        return m_realWidth;
-    }
+	double realWidth() const
+	{
+		return m_realWidth;
+	}
 
-signals :
+	int r() const
+	{
+		return m_r;
+	}
+
+	int g() const
+	{
+		return m_g;
+	}
+
+	int b() const
+	{
+		return m_b;
+	}
+
+	int penSize() const
+	{
+		return m_penSize;
+	}
+
+	signals :
 
 	void aDirChanged(QString aDir);
 
@@ -76,9 +110,17 @@ signals :
 
 	void filenameChanged(QString filename);
 
-    void realHeightChanged(double realHeight);
+	void realHeightChanged(double realHeight);
 
-    void realWidthChanged(double realWidth);
+	void realWidthChanged(double realWidth);
+
+	void rChanged(int r);
+
+	void gChanged(int g);
+
+	void bChanged(int b);
+
+	void penSizeChanged(int penSize);
 
 public slots:
 	void setADir(QString aDir)
@@ -104,7 +146,7 @@ public slots:
 		if (m_filename == filename)
 			return;
 		auto a = m_aDir.startsWith("file:///") ? m_aDir.mid(8) : m_aDir;
-		auto b = m_bDir.startsWith("file:///")?m_bDir.mid(8):m_bDir;
+		auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;
 		ip->image_map["b"].save(QDir(b).filePath(m_filename));
 		m_filename = filename;
 
@@ -130,23 +172,64 @@ public slots:
 			}
 		}
 		emit filenameChanged(filename);
-    }
-    void setRealHeight(double realHeight)
-    {
-        if (m_realHeight == realHeight)
-            return;
+	}
 
-        m_realHeight = realHeight;
-        emit realHeightChanged(realHeight);
-    }
-    void setRealWidth(double realWidth)
-    {
-        if (m_realWidth == realWidth)
-            return;
+	void setRealHeight(double realHeight)
+	{
+		if (m_realHeight == realHeight)
+			return;
 
-        m_realWidth = realWidth;
-        emit realWidthChanged(realWidth);
-    }
+		m_realHeight = realHeight;
+		emit realHeightChanged(realHeight);
+	}
+
+	void setRealWidth(double realWidth)
+	{
+		if (m_realWidth == realWidth)
+			return;
+
+		m_realWidth = realWidth;
+		emit realWidthChanged(realWidth);
+	}
+
+	void setR(int r)
+	{
+		if (m_r == r)
+			return;
+
+		m_r = r;
+		c = QColor(m_r, m_g, m_b);
+		emit rChanged(r);
+	}
+
+	void setG(int g)
+	{
+		if (m_g == g)
+			return;
+
+		m_g = g;
+		c = QColor(m_r, m_g, m_b);
+		emit gChanged(g);
+	}
+
+	void setB(int b)
+	{
+		if (m_b == b)
+			return;
+
+		m_b = b;
+		c = QColor(m_r, m_g, m_b);
+		emit bChanged(b);
+	}
+
+	void setPenSize(int penSize)
+	{
+		if (m_penSize == penSize)
+			return;
+
+		m_penSize = penSize;
+		emit penSizeChanged(penSize);
+	}
 };
 
 #endif // MARKER_H

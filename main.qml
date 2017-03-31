@@ -3,6 +3,7 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.0
 import Qt.labs.folderlistmodel 2.1
+import QtQuick.Controls.Material 2.0
 
 ApplicationWindow {
     visible: true
@@ -57,10 +58,60 @@ ApplicationWindow {
 
             }
             Item { Layout.fillWidth: true }
-            CheckBox {
-                text: "Enabled"
-                checked: true
-                Layout.alignment: Qt.AlignRight
+            Text {
+                id: text1
+                text: qsTr("画笔大小")
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: spinBox3
+                maximumValue: 99
+                minimumValue: 0
+                value: marker.penSize
+                onValueChanged: marker.penSize = value
+            }
+
+            Text {
+                id: text2
+                text: qsTr("R")
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: spinBox2
+                maximumValue: 255
+                minimumValue: 0
+                value: marker.r
+                onValueChanged: marker.r = value
+            }
+
+            Text {
+                id: text4
+                text: qsTr("G")
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: spinBox1
+                maximumValue: 255
+                minimumValue: 0
+                value: marker.g
+                onValueChanged: marker.g = value
+            }
+
+            Text {
+                id: text3
+                text: qsTr("B")
+                font.pixelSize: 12
+            }
+
+            SpinBox {
+                id: spinBox
+                maximumValue: 255
+                minimumValue: 0
+                value: marker.b
+                onValueChanged: marker.b = value
             }
         }
     }
@@ -168,8 +219,8 @@ ApplicationWindow {
                         image_a.ypos = mouseY
                         image_a.drawing=true;
                         marker.draw(image_a.xpos,image_a.y.pos);
-						image_a.refresh();
-						image_b.refresh();
+                        image_a.refresh();
+                        image_b.refresh();
                     }
                     onReleased:
                     {
@@ -180,21 +231,21 @@ ApplicationWindow {
                         image_a.xpos = mouseX
                         image_a.ypos = mouseY
                         if(image_a.drawing)
-						{
+                        {
                             marker.draw(image_a.xpos,image_a.ypos);
-							image_a.refresh();
-							image_b.refresh();
-						}
+                            image_a.refresh();
+                            image_b.refresh();
+                        }
                     }
                     onMouseYChanged: {
                         image_a.xpos = mouseX
                         image_a.ypos = mouseY
                         if(image_a.drawing)
-						{
+                        {
                             marker.draw(image_a.xpos,image_a.ypos);
-							image_a.refresh();
-							image_b.refresh();
-						}
+                            image_a.refresh();
+                            image_b.refresh();
+                        }
                     }
                 }
             }
