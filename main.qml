@@ -8,7 +8,7 @@ ApplicationWindow {
     visible: true
     width: 800
     height: 600
-    title: qsTr("Hello World")
+    title: marker.filename?marker.filename:"Marker"
     visibility: "Maximized"
 
     FileDialog {
@@ -100,6 +100,8 @@ ApplicationWindow {
             onCurrentItemChanged: {
                 marker.filename=folderModel.get(currentIndex,"fileName");
                 console.log(marker.filename);
+                image_a.refresh();
+                image_b.refresh();
             }
 
             model: folderModel
@@ -127,39 +129,55 @@ ApplicationWindow {
                     Layout.fillWidth: true
                 }
             }
-            Canvas {
+            Image {
                 property int xpos
                 property int ypos
+                property bool drawing: false
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 id: image_a
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.fillStyle = "red";
-                    ctx.fillRect(xpos-1, ypos-1, 3, 3);
+                source:"image://image/a"
+                cache: false
+
+                fillMode: Image.PreserveAspectFit
+
+                function refresh(){
+
+                    var t=source;
+
+                    source="";
+
+                    source=t;
+
+                    console.log(t+" refreshed.");
+
                 }
                 MouseArea
                 {
+
                     anchors.fill:parent
                     onPressed: {
-                        xpos = mouseX
-                        ypos = mouseY
-                        image_a.requestPaint()
+                        image_a.xpos = mouseX
+                        image_a.ypos = mouseY
+                        image_a.drawing=true;
+                        marker.draw(image_a.xpos,image_a.y.pos);
                     }
                     onReleased:
                     {
-                        image_a.
+                        image_a.drawing=false;
                     }
 
                     onMouseXChanged: {
-                        xpos = mouseX
-                        ypos = mouseY
-                        image_a.requestPaint()
+                        image_a.xpos = mouseX
+                        image_a.ypos = mouseY
+                        if(image_a.drawing)
+                            marker.draw(image_a.xpos,image_a.ypos);
                     }
                     onMouseYChanged: {
-                        xpos = mouseX
-                        ypos = mouseY
-                        image_a.requestPaint()
+                        image_a.xpos = mouseX
+                        image_a.ypos = mouseY
+                        if(image_a.drawing)
+                            marker.draw(image_a.xpos,image_a.ypos);
                     }
                 }
             }
@@ -186,6 +204,22 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 id: image_b
+                source:"image://image/b"
+                cache: false
+
+                fillMode: Image.PreserveAspectFit
+
+                function refresh(){
+
+                    var t=source;
+
+                    source="";
+
+                    source=t;
+
+                    console.log(t+" refreshed.");
+
+                }
             }
         }
     }
