@@ -156,7 +156,8 @@ ApplicationWindow {
                     source=t;
 
                     console.log(t+" refreshed.");
-
+                    marker.realWidth=image_a.paintedWidth;
+                    marker.realHeight=image_a.paintedHeight;
                 }
                 MouseArea
                 {
@@ -167,6 +168,8 @@ ApplicationWindow {
                         image_a.ypos = mouseY
                         image_a.drawing=true;
                         marker.draw(image_a.xpos,image_a.y.pos);
+						image_a.refresh();
+						image_b.refresh();
                     }
                     onReleased:
                     {
@@ -177,13 +180,21 @@ ApplicationWindow {
                         image_a.xpos = mouseX
                         image_a.ypos = mouseY
                         if(image_a.drawing)
+						{
                             marker.draw(image_a.xpos,image_a.ypos);
+							image_a.refresh();
+							image_b.refresh();
+						}
                     }
                     onMouseYChanged: {
                         image_a.xpos = mouseX
                         image_a.ypos = mouseY
                         if(image_a.drawing)
+						{
                             marker.draw(image_a.xpos,image_a.ypos);
+							image_a.refresh();
+							image_b.refresh();
+						}
                     }
                 }
             }

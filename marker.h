@@ -5,6 +5,8 @@
 #include <QString>
 #include <QFileInfo>
 #include <QDir>
+#include <QDebug>
+
 #include <iostream>
 #include "imageprovider.h"
 
@@ -14,19 +16,31 @@ class Marker : public QObject
 	Q_PROPERTY(QString aDir READ aDir WRITE setADir NOTIFY aDirChanged)
 	Q_PROPERTY(QString bDir READ bDir WRITE setBDir NOTIFY bDirChanged)
 	Q_PROPERTY(QString filename READ filename WRITE setFilename NOTIFY filenameChanged)
-
+    Q_PROPERTY(double realHeight READ realHeight WRITE setRealHeight NOTIFY realHeightChanged)
+    Q_PROPERTY(double realWidth READ realWidth WRITE setRealWidth NOTIFY realWidthChanged)
 	QString m_aDir = "";
 	QString m_bDir = "";
 	QString m_filename = "";
-	ImageProvider* ip;
+    ImageProvider* ip;
+    double m_realHeight;
+
+    double m_realWidth;
+
 public:
-	explicit Marker(ImageProvider* i, QObject* parent = 0): ip(i)
+	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i)
 	{
 	}
 
 	Q_INVOKABLE void draw(int x, int y)
 	{
-		std::cout << x << " " << y << std::endl;
+        qDebug()<< x << " " << y;
+		auto&& image_a = ip->image_map["a"];
+		auto&& image_b = ip->image_map["b"];
+        x=x/m_realWidth*(image_a.size().width());
+		y = y / m_realHeight*image_a.size().height();
+
+		image_b.setPixel(x, y, 0xffffff);
+
 	}
 
 	QString aDir() const
@@ -44,13 +58,27 @@ public:
 		return m_filename;
 	}
 
-	signals :
+    double realHeight() const
+    {
+        return m_realHeight;
+    }
+
+    double realWidth() const
+    {
+        return m_realWidth;
+    }
+
+signals :
 
 	void aDirChanged(QString aDir);
 
 	void bDirChanged(QString bDir);
 
 	void filenameChanged(QString filename);
+
+    void realHeightChanged(double realHeight);
+
+    void realWidthChanged(double realWidth);
 
 public slots:
 	void setADir(QString aDir)
@@ -102,7 +130,23 @@ public slots:
 			}
 		}
 		emit filenameChanged(filename);
-	}
+    }
+    void setRealHeight(double realHeight)
+    {
+        if (m_realHeight == realHeight)
+            return;
+
+        m_realHeight = realHeight;
+        emit realHeightChanged(realHeight);
+    }
+    void setRealWidth(double realWidth)
+    {
+        if (m_realWidth == realWidth)
+            return;
+
+        m_realWidth = realWidth;
+        emit realWidthChanged(realWidth);
+    }
 };
 
 #endif // MARKER_H
