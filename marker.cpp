@@ -103,29 +103,48 @@ void Marker::setFilename(QString filename)
 	auto a = m_aDir.startsWith("file:///") ? m_aDir.mid(8) : m_aDir;
 	auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;
 	auto&& image_b = ip->image_map["b"];
-	image_b.save(QDir(b).filePath(m_filename));
+	auto&& image_a = ip->image_map["a"];
+	auto old_path_b = QDir(b).filePath(m_filename);
+	auto old_path_a = QDir(a).filePath(m_filename);
+	image_b.save(old_path_b);
 	setDirty(false);
 	m_filename = filename;
 
 	if (m_filename.isEmpty() == false)
 	{
-		auto&& image = ip->image_map["a"];
-
-		auto a_path = QDir(a).filePath(m_filename);
-		QFileInfo c(a_path);
+		
+		auto path_a = QDir(a).filePath(m_filename);
+		auto path_b = QDir(b).filePath(m_filename);
+		QFileInfo c(path_a);
 		if (c.exists() == false)
 			throw "can not open file";
-		image.load(a_path);
-		ip->image_map["c"] = image.copy();
-		auto b_path = QDir(b).filePath(m_filename);
-		QFileInfo check_file(b_path);
+		image_a.load(path_a);
+		ip->image_map["c"] = image_a.copy();
+
+		QFileInfo check_file(path_b);
 		if (check_file.exists() && check_file.isFile())
 		{
-			image_b.load(b_path);
+			image_b.load(path_b);
+			if (image_a.size() != image_b.size())
+			{
+				qDebug() << image_a.size() << " " << image_b.size();
+				image_b = QImage(image_a.size(), image_a.format());
+				image_b.fill(QColor(255, 255, 255));
+			}
+			else
+			{
+				for (int i = 0; i < image_a.size().width(); ++i)
+					for (int j = 0; j < image_b.size().height(); ++j)
+					{
+						auto&& pixel_color = image_b.pixelColor(i, j);
+						if (pixel_color != QColor(255, 255, 255))
+							image_a.setPixelColor(i, j, pixel_color);
+					}
+			}
 		}
 		else
 		{
-			image_b = QImage(ip->image_map["a"].size(), ip->image_map["a"].format());
+			image_b = QImage(image_a.size(), image_a.format());
 			image_b.fill(QColor(255, 255, 255));
 		}
 	}
