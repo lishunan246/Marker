@@ -1,5 +1,9 @@
 #include "marker.h"
 
+Marker::Marker(ImageProvider* i): ip(i), c(0, 0, 0)
+{
+}
+
 void Marker::saveImageB()
 {
 	auto b = m_bDir.startsWith("file:///") ? m_bDir.mid(8) : m_bDir;

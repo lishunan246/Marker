@@ -32,6 +32,12 @@ ApplicationWindow {
                 event.accepted = true;
                 console.log("+");
             }
+			else if(event.key === Qt.Key_T)
+            {
+                image_a.toggle();
+                event.accepted = true;
+                console.log("toggle");
+            }
         }
 
 
@@ -193,7 +199,7 @@ ApplicationWindow {
                     id: folderModel
                     folder: marker.aDir
                     showDirs: false
-                    nameFilters: [ "*.png", "*.jpg" ,"*.bmp","*.jpeg"]
+                    nameFilters: [ "*.png","*.bmp"]
                 }
 
                 Component {
@@ -253,6 +259,13 @@ ApplicationWindow {
                     source:"image://image/a"
                     cache: false
                     fillMode: Image.PreserveAspectFit
+					function toggle()
+					{
+						if(image_a.source=="image://image/a")
+                            image_a.source="image://image/c";
+						else
+							image_a.source="image://image/a";
+					}
 
                     function refresh(){
                         var t=source;

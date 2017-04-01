@@ -36,9 +36,7 @@ class Marker : public QObject
     QColor c;
     bool m_dirty=false;
 public:
-	explicit Marker(ImageProvider* i, QObject* parent = nullptr): ip(i), c(0, 0, 0)
-	{
-	}
+	explicit Marker(ImageProvider* i);
 
     Q_INVOKABLE void saveImageB();
 
@@ -64,7 +62,7 @@ public:
 
 	bool dirty() const;
 
-signals :
+	signals :
 
 	void aDirChanged(QString aDir);
 
