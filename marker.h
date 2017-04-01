@@ -88,6 +88,8 @@ public slots:
 	void setADir(QString aDir);
 
 	void setBDir(QString bDir);
+	
+	void loadImageB();
 
 	void setFilename(QString filename);
 
